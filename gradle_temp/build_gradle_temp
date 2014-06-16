@@ -1,0 +1,36 @@
+apply plugin: 'war'
+apply plugin: 'java'
+
+webAppDirName = 'web/'
+
+configurations {
+    ajc
+    aspects
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final"
+    compile "org.springframework:spring-core:$springVersion",
+            "org.springframework:spring-web:$springVersion",
+            "org.springframework:spring-orm:$springVersion",
+            "org.hibernate:hibernate-core:$hibernateVersion",
+            "org.hibernate:hibernate-entitymanager:$hibernateVersion"
+
+    testCompile group: 'junit', name: 'junit', version: '4.8+'
+    testCompile "org.springframework:spring-test:$springVersion"
+}
+
+task deploy() {
+    doLast {
+        copy {
+            from "build/libs"
+            into "/home/imran.azad/d-soft/apache-tomcat-7.0.53/webapps"
+            include "*.war"
+        }
+        println 'war deployed into tomcat'
+    }
+}
