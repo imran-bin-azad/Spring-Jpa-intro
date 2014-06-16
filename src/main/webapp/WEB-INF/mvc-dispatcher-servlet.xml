@@ -42,4 +42,10 @@
         <property name="entityManagerFactory" ref="entityManagerFactory" />
     </bean>
 
+    <!--Manual impl of jpaTranscation by TransactionTemplate-->
+    <bean class="org.springframework.transaction.support.TransactionTemplate">
+        <property name="transactionManager" ref="jpaTransactionManager" />
+    </bean>
+
+
 </beans>

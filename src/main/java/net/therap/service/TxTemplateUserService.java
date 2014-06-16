@@ -6,7 +6,10 @@ import net.therap.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.List;
 
@@ -19,6 +22,9 @@ public class TxTemplateUserService implements UserService {
     @Autowired
     @Qualifier("jpaUserDao")
     private UserDao userDao;
+
+    @Autowired
+    private TransactionTemplate transactionTemplate;
 
     public User verifyUserAndGetLoginDetails(User user) throws InvalidUserException {
         String userName = user.getUserName();
@@ -49,8 +55,20 @@ public class TxTemplateUserService implements UserService {
         return user;
     }
 
-    public void addNewUser(User user) {
-        userDao.insertUser(user);
+    public void addNewUser(final User user) {
+        transactionTemplate.execute(new TransactionCallback<Void>() {
+            @Override
+            public Void doInTransaction(TransactionStatus transactionStatus) {
+                try {
+                    userDao.insertUser(user);
+                } catch (RuntimeException e) {
+                    transactionStatus.setRollbackOnly();
+                    throw e;
+                }
+
+                return null;
+            }
+        });
     }
 
     public List<User> getListOfAdmins() {

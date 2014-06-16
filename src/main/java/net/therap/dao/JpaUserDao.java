@@ -39,7 +39,7 @@ public class JpaUserDao implements UserDao {
     @Override
     public List<User> getAdmins() {
         Query query = entityManager.createQuery("FROM User AS T WHERE T.isAdmin=:admin");
-        query.setParameter("admin", false);
+        query.setParameter("admin", true);
         return query.getResultList();
     }
 }
